@@ -31,7 +31,6 @@ export const getBook = async (req, res) => {
         model: userModel
       }
     });
-    //console.log(book);
     if (book)
       res
         .status(200)
@@ -46,7 +45,7 @@ export const postBook = async (req, res) => {
     body: { title, authors, isbn, contents, uid },
     file
   } = req;
-  console.log(file);
+  //console.log(file);
   try {
     const book = new bookModel();
     const user = await userModel.findById(uid);
@@ -74,17 +73,26 @@ export const postRate = async (req, res) => {
   const {
     body: { title, authors, vote, isbn, name, thumbnail }
   } = req;
-  console.log(req.body);
   try {
     const user = await userModel.findByUsername(name);
     const book = await bookModel.findOne({ isbn: isbn });
-    //console.log(book);
     if (book !== null) {
       book.title = title;
       book.authors = authors;
       book.isbn = isbn;
       book.thumbnail = thumbnail;
-      book.votes.push(vote);
+      if (book.votes.length > 0) {
+        let idx = -1;
+        for (let i = 0; i < book.votes.length; i++) {
+          if (String(book.votes[i]._id) === String(user.id)) {
+            idx = i;
+            break;
+          }
+        }
+        if (idx !== -1) book.votes.splice(idx, 1);
+        //유저가 예전에 이미 평점을 부여했을 경우 전에 부여했던 기록을 지우고 새로운 평가 점수를 추가
+      }
+      book.votes.push({ vote: vote, _id: user._id }); //{vote point, user._id}
       book.save();
       user.votes.push(book.id);
       res.status(200).json({ error: 0, book });
@@ -94,7 +102,7 @@ export const postRate = async (req, res) => {
       newBook.authors = authors;
       newBook.isbn = isbn;
       newBook.thumbnail = thumbnail;
-      newBook.votes.push(vote);
+      newBook.votes.push({ vote: vote, _id: user_id }); //{vote point, user._id}
       newBook.save();
       user.votes.push(newBook.id);
       res.status(200).json({ error: 0, book: newBook });

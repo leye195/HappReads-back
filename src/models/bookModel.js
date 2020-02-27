@@ -24,7 +24,7 @@ const bookSchema = new mongoose.Schema({
       ref: "Review"
     }
   ],
-  votes: [{ type: Number }]
+  votes: [] //[{vote point, user._id}
 });
 const bookModel = mongoose.model("Book", bookSchema);
 export default bookModel;
