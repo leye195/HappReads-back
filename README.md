@@ -3,7 +3,7 @@
 ### Back 사용기술:
 
 - express (nodejs 프레임워크)
-- mongoose (mongoDB)
+- mongoDB (mongoose)
 - passport.js (로그인 인증)
 - multer-S3 (AWS-S3스토리지에 이용 파일 저장)
 
