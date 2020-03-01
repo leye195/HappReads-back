@@ -84,7 +84,7 @@ export const postRate = async (req, res) => {
       if (book.votes.length > 0) {
         let idx = -1;
         for (let i = 0; i < book.votes.length; i++) {
-          if (String(book.votes[i]._id) === String(user.id)) {
+          if (String(book.votes[i]._id) === String(user._id)) {
             idx = i;
             break;
           }
@@ -102,7 +102,7 @@ export const postRate = async (req, res) => {
       newBook.authors = authors;
       newBook.isbn = isbn;
       newBook.thumbnail = thumbnail;
-      newBook.votes.push({ vote: vote, _id: user_id }); //{vote point, user._id}
+      newBook.votes.push({ vote: vote, _id: user._id }); //{vote point, user._id}
       newBook.save();
       user.votes.push(newBook.id);
       res.status(200).json({ error: 0, book: newBook });
@@ -142,7 +142,7 @@ export const postReview = async (req, res) => {
   const {
     body: { name, isbn, content, book: info }
   } = req;
-  console.log(info);
+  console.log(info, isbn);
   try {
     const user = await userModel.findByUsername(name);
     const book = await bookModel.findOne({ isbn: isbn }).populate("review");

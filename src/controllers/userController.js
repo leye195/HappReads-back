@@ -1,9 +1,9 @@
 import userModel from "../models/userModel";
 import passport from "passport";
 import routes from "../routes";
-//import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bookModel from "../models/bookModel";
+import reviewModel from "../models/reviewModel";
 dotenv.config();
 export const postLogin = passport.authenticate("local", {
   session: false, //won't save user in session
@@ -55,10 +55,8 @@ export const postEdit = async (req, res) => {
     body: { email, nickname, intro, website, interest },
     file
   } = req;
-  console.log(req.body);
   try {
     const user = await userModel.findByUsername(email);
-    //console.log(location);
     if (req.file) user.avatarUrl = file.location;
     if (nickname) user.nickname = nickname;
     if (intro) user.intro = intro;
@@ -77,27 +75,47 @@ export const postShelve = async (req, res) => {
   } = req;
   try {
     const book = await bookModel.findOne({ isbn: isbn });
-    const user = await userModel.findByUsername(email);
-    //console.log(book, user);
+    const user = await userModel
+      .findByUsername(email)
+      .populate("reading")
+      .populate("read")
+      .populate("want_read")
+      .populate({
+        path: "reviews",
+        populate: { path: "book" }
+      })
+      .populate("uploaded");
     if (book) {
       if (user[type].indexOf(book._id) === -1) {
         if (type === "want_read") {
-          if (user["reading"].indexOf(book.id) !== -1)
-            user["reading"].splice(user["reading"].indexOf(book.id), 1);
-          if (user["read"].indexOf(book.id) !== -1)
-            user["read"].splice(user["read"].indexOf(book.id), 1);
+          const reading = user["reading"].filter(item => {
+            return String(item._id) !== String(book._id);
+          });
+          const read = user["read"].filter(item => {
+            return String(item._id) !== String(book._id);
+          });
+          user["reading"] = reading;
+          user["read"] = read;
         } else if (type === "reading") {
-          if (user["read"].indexOf(book._id) !== -1)
-            user["read"].splice(user["read"].indexOf(book.id), 1);
-          if (user["want_read"].indexOf(book._id) !== -1)
-            user["want_read"].splice(user["want_read"].indexOf(book.id), 1);
+          const want_read = user["want_read"].filter(item => {
+            return String(item.id) !== String(book._id);
+          });
+          const read = user["read"].filter(item => {
+            return String(item.id) !== String(book._id);
+          });
+          user["read"] = read;
+          user["want_read"] = want_read;
         } else if (type === "read") {
-          if (user["reading"].indexOf(book._id) !== -1)
-            user["reading"].splice(user["reading"].indexOf(book.id), 1);
-          if (user["want_read"].indexOf(book._id) !== -1)
-            user["want_read"].splice(user["want_read"].indexOf(book.id), 1);
+          const reading = user["reading"].filter(item => {
+            return String(item.id) !== String(book._id);
+          });
+          const want_read = user["want_read"].filter(item => {
+            return String(item.id) !== String(book._id);
+          });
+          user["reading"] = reading;
+          user["want_read"] = want_read;
         }
-        user[type].push(book._id);
+        user[type].push(book);
         user.save();
       }
     } else {
@@ -109,23 +127,56 @@ export const postShelve = async (req, res) => {
       user[type].push(newBook._id);
       user.save();
     }
-    res.status(200).json({ error: 0 });
+    res.status(200).json({ error: 0, profile: user });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: 1 });
   }
 };
-
-export const postLike = async (req, res) => {
+export const deleteShelve = async (req, res) => {
   const {
-    body: { id, type }
+    body: { uid, type }
   } = req;
   try {
-    const review = await reviewModel.findById(id);
-    if (type === "like") review.like += 1;
-    else if (type === "unlike") review.unlike -= 1;
-    review.save();
+    const book = await bo;
     res.status(200).json({ error: 0 });
+  } catch (error) {
+    res.status(400).end();
+  }
+};
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+export const postLike = async (req, res) => {
+  const {
+    body: { id, type, uid, m_id } // id->review._id ,u_id -> user._id, m_id: my._id
+  } = req;
+  console.log();
+  try {
+    const user = await userModel
+      .findById(uid)
+      .populate("reading")
+      .populate("read")
+      .populate("want_read")
+      .populate({
+        path: "reviews",
+        populate: { path: "book" }
+      })
+      .populate("uploaded");
+    const review = await reviewModel.findById(id);
+    for (let i = 0; i < user.reviews.length; i++) {
+      if (String(user.reviews[i]._id) === String(review._id)) {
+        user.reviews[i].likes += 1;
+        review.likes += 1;
+        break;
+      }
+    }
+    user.save();
+    review.save();
+    res.status(200).json({ error: 0, profile: user });
   } catch (error) {
     console.log(error);
     res.status(400).end();

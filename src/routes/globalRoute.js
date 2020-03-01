@@ -8,7 +8,8 @@ import {
   postLogout,
   postEdit,
   postShelve,
-  getProfile
+  getProfile,
+  postLike
 } from "../controllers/userController";
 import { uploadAvatarMiddleware, uploadCoverMiddleware } from "../middlewares";
 import { postBook, getBooks } from "../controllers/bookController";
@@ -36,4 +37,5 @@ app.post(routes.edit, uploadAvatarMiddleware, postEdit);
 app.post(routes.shelve, postShelve);
 app.post(routes.upload, uploadCoverMiddleware, postBook);
 
+app.post(routes.review + "/like", postLike);
 export default app;

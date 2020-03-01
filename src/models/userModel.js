@@ -62,6 +62,12 @@ const userSchema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Book"
     }
+  ],
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review"
+    }
   ]
 });
 userSchema.plugin(passportLocalMongoose, { usernameField: "email" }); //plugin 추가

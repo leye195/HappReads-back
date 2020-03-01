@@ -24,7 +24,11 @@ const bookSchema = new mongoose.Schema({
       ref: "Review"
     }
   ],
-  votes: [] //[{vote point, user._id}
+  votes: [], //[{vote point, user._id}
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 const bookModel = mongoose.model("Book", bookSchema);
 export default bookModel;
