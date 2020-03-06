@@ -31,6 +31,7 @@ export const getProfile = async (req, res) => {
   const {
     params: { id }
   } = req;
+  //console.log(id);
   try {
     const user = await userModel
       .findById(id)
@@ -73,6 +74,7 @@ export const postShelve = async (req, res) => {
   const {
     body: { email, isbn, title, authors, type }
   } = req;
+  console.log(email);
   try {
     const book = await bookModel.findOne({ isbn: isbn });
     const user = await userModel
@@ -135,12 +137,28 @@ export const postShelve = async (req, res) => {
 };
 export const deleteShelve = async (req, res) => {
   const {
-    body: { uid, type }
+    body: { uid, type },
+    params: { id }
   } = req;
   try {
-    const book = await bo;
-    res.status(200).json({ error: 0 });
+    const user = await userModel
+      .findById(uid)
+      .populate("reading")
+      .populate("read")
+      .populate("want_read")
+      .populate({
+        path: "reviews",
+        populate: { path: "book" }
+      })
+      .populate("uploaded");
+    const newList = user[type].filter(item => {
+      return String(item.id) !== String(id);
+    });
+    user[type] = newList;
+    user.save();
+    res.status(200).json({ error: 0, profile: user });
   } catch (error) {
+    console.log(error);
     res.status(400).end();
   }
 };

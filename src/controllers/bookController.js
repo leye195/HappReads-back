@@ -178,5 +178,48 @@ export const postReview = async (req, res) => {
     res.status(400).json({ error: 1 });
   }
 };
-
-export const deleteReview = (req, res) => {};
+/**
+ * DELETE /:id/review/:rid
+ * @param {*} req
+ * @param {*} res
+ */
+export const deleteReview = async (req, res) => {
+  const {
+    params: { isbn, rid },
+    body: { uid, from }
+  } = req;
+  try {
+    console.log(uid, bid, rid);
+    const review = await reviewModel.findByIdAndDelete(rid);
+    const book = await bookModel.findOne({ isbn: isbn }).populate("review");
+    const user = await userModel
+      .findById(uid)
+      .populate("reading")
+      .populate("read")
+      .populate("want_read")
+      .populate({
+        path: "reviews",
+        populate: { path: "book" }
+      })
+      .populate("uploaded");
+    const cleanedBookReviews = book.review.filter(review => {
+      return String(review.id) !== String(rid);
+    });
+    const cleanedReviews = user.reviews.filter(review => {
+      return String(review.id) !== String(rid);
+    });
+    book.review = cleanedBookReviews;
+    user.reviews = cleanedReviews;
+    book.save();
+    user.save();
+    if (from === "profile") {
+      res.status(200).json({ error: 0, profile: user });
+    } else if (from === "book") {
+      res.status(200).json({ error: 0, reviews: book.review });
+    } else {
+      throw error("from should be profile or book");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

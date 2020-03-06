@@ -27,7 +27,7 @@ const bookSchema = new mongoose.Schema({
   votes: [], //[{vote point, user._id}
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now()
   }
 });
 const bookModel = mongoose.model("Book", bookSchema);
