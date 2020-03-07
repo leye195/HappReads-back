@@ -3,7 +3,8 @@
 ### Back 사용기술:
 
 - express (nodejs 프레임워크)
-- mongoDB (mongoose)
+- mongoDB (DB)
+- mongoose (ODM)
 - passport.js (로그인 인증 이용 소셜 로그인 및 로컬 로그인,가입 진행)
 - multer-S3 (AWS-S3스토리지에 업로드 할 파일,이미지 저장)
 
@@ -39,3 +40,7 @@
 ### 2020.02.26
 
 1. 책 서재 추가/변경 api 수정 진행, 기존에 api를 통해 보내줬던 데이터는 책의 \_id만 포함 되어있었지만, 수정 후 front-end에서 리덕스를 통해 갱신된 리스트 데이터를 받아와야되기 때문에 .populate()를 이용해 bookModel을 참조한 데이터들도 같이 전송해줌
+
+### 2020.03.06 ~ 07
+
+- community에 데이터를 제공할 route 경로 /reviews , /rank/reader/:type , /rank/reviewer/:type을 추가했으며, controller에 getReviews, getTopReaders, getTopReviews를 추가하여 front에 정보를 제공해주는 작업 완료함

@@ -18,14 +18,15 @@ passport.use(
       if (jwtPayload.user) {
         //console.log(jwtPayload.user._id);
         const user = await User.findById(jwtPayload.user._id)
-          .populate("reading")
-          .populate("read")
-          .populate("want_read")
+          .populate("reading.book")
+          .populate("read.book")
+          .populate("want_read.book")
           .populate({
             path: "reviews",
             populate: { path: "book" }
           })
           .populate("uploaded");
+        //console.log(user);
         return done(null, user);
       } else return done(null, false);
     }

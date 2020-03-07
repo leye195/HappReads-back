@@ -47,20 +47,29 @@ const userSchema = mongoose.Schema({
   ],
   want_read: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Book"
+      book: { type: mongoose.Schema.Types.ObjectId, ref: "Book" },
+      createdAt: {
+        type: Date,
+        default: new Date()
+      }
     }
   ],
   reading: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Book"
+      book: { type: mongoose.Schema.Types.ObjectId, ref: "Book" },
+      createdAt: {
+        type: Date,
+        default: new Date()
+      }
     }
   ],
   read: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Book"
+      book: { type: mongoose.Schema.Types.ObjectId, ref: "Book" },
+      createdAt: {
+        type: Date,
+        default: new Date()
+      }
     }
   ],
   likes: [

@@ -194,9 +194,9 @@ export const deleteReview = async (req, res) => {
     const book = await bookModel.findOne({ isbn: isbn }).populate("review");
     const user = await userModel
       .findById(uid)
-      .populate("reading")
-      .populate("read")
-      .populate("want_read")
+      .populate("reading.book")
+      .populate("read.book")
+      .populate("want_read.book")
       .populate({
         path: "reviews",
         populate: { path: "book" }

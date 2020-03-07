@@ -10,13 +10,18 @@ import {
   postShelve,
   getProfile,
   postLike,
-  deleteShelve
+  deleteShelve,
+  getReviews,
+  getTopReaders,
+  getTopReviewers
 } from "../controllers/userController";
 import { uploadAvatarMiddleware, uploadCoverMiddleware } from "../middlewares";
 import { postBook, getBooks } from "../controllers/bookController";
 const app = express.Router();
 
 app.get(routes.books, getBooks);
+app.get(routes.reviews, getReviews);
+
 app.post(routes.login, postLogin, (req, res) => {
   const { user } = req;
   const token = jwt.sign({ user }, process.env.JWT_SECRET);
@@ -26,19 +31,21 @@ app.get(routes.loginfailure, (req, res) => {
   res.status(404).json({ loggedIn: 0 });
 });
 app.post(routes.signup, postSignUp);
+app.post(routes.logout, postLogout);
 
-app.get(routes.profile + "/:id", getProfile);
+app.get(`${routes.profile}/:id`, getProfile);
 app.post(routes.profile, postProfile, (req, res) => {
   const { user } = req;
   res.status(200).json({ profile: user });
 });
-app.post(routes.logout, postLogout);
 app.post(routes.edit, uploadAvatarMiddleware, postEdit);
 
 app.post(routes.shelve, postShelve);
 app.post(`${routes.shelve}/:id`, deleteShelve);
 
 app.post(routes.upload, uploadCoverMiddleware, postBook);
+app.post(`${routes.review}/like`, postLike);
 
-app.post(routes.review + "/like", postLike);
+app.get(`${routes.rank}/reader/:type`, getTopReaders);
+app.get(`${routes.rank}/reviewer/:type`, getTopReviewers);
 export default app;
