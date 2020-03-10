@@ -223,3 +223,18 @@ export const deleteReview = async (req, res) => {
     console.log(error);
   }
 };
+export const editReview = async (req, res) => {
+  const {
+    params: { rid },
+    body: { content }
+  } = req;
+  try {
+    const review = await reviewModel.findByIdAndUpdate(rid, {
+      content: content
+    });
+    res.status(200).json({ error: 0 });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: 1 });
+  }
+};

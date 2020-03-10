@@ -44,3 +44,7 @@
 ### 2020.03.06 ~ 07
 
 - community에 데이터를 제공할 route 경로 /reviews , /rank/reader/:type , /rank/reviewer/:type을 추가했으며, controller에 getReviews, getTopReaders, getTopReviews를 추가하여 front에 정보를 제공해주는 작업 완료함
+
+### 2020.03.09
+
+- review 수정 요청을 처리하기 위한 editReview를 bookController에 작성하고 , /book/review/:rid 에 연결해줘 리뷰를 수정해줌.
