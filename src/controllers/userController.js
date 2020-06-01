@@ -119,9 +119,11 @@ export const postShelve = async (req, res) => {
           user["want_read"] = want_read;
         }
         user[type].push({ book: book });
+        console.log(user[type]);
         user.save();
       }
     }
+    //console.log(user);
     res.status(200).json({ error: 0, profile: user });
   } catch (error) {
     console.log(error);
@@ -130,9 +132,9 @@ export const postShelve = async (req, res) => {
 };
 export const deleteShelve = async (req, res) => {
   const {
-    body: { uid, type },
-    params: { id },
+    body: { uid, type, id },
   } = req;
+  console.log();
   try {
     const user = await userModel
       .findById(uid)
@@ -145,7 +147,7 @@ export const deleteShelve = async (req, res) => {
       })
       .populate("uploaded");
     const newList = user[type].filter((item) => {
-      return String(item.book.id) !== String(id);
+      return item.book !== null && String(item.book.id) !== String(id);
     });
     user[type] = newList;
     user.save();

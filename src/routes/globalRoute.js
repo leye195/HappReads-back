@@ -47,7 +47,7 @@ app.post(routes.profile, postProfile, (req, res) => {
 app.post(routes.edit, uploadAvatarMiddleware, postEdit);
 
 app.post(routes.shelve, postShelve);
-app.post(`${routes.shelve}/:id`, deleteShelve);
+app.delete(routes.shelve, deleteShelve);
 
 app.post(routes.upload, uploadCoverMiddleware, postBook);
 app.post(`${routes.review}/like`, postLike);
