@@ -13,13 +13,19 @@ import {
   deleteShelve,
   getReviews,
   getTopReaders,
-  getTopReviewers
+  getTopReviewers,
 } from "../controllers/userController";
 import { uploadAvatarMiddleware, uploadCoverMiddleware } from "../middlewares";
-import { postBook, getBooks } from "../controllers/bookController";
+import {
+  postBook,
+  getBooks,
+  getBookSearch,
+} from "../controllers/bookController";
 const app = express.Router();
 
 app.get(routes.books, getBooks);
+app.get(routes.books + `/search`, getBookSearch);
+
 app.get(routes.reviews, getReviews);
 
 app.post(routes.login, postLogin, (req, res) => {

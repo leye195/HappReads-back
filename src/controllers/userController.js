@@ -8,13 +8,14 @@ import moment from "moment";
 dotenv.config();
 export const postLogin = passport.authenticate("local", {
   session: false, //won't save user in session
-  failureRedirect: routes.loginfailure
+  failureRedirect: routes.loginfailure,
 });
 
 export const postSignUp = async (req, res) => {
   const {
-    body: { email, password }
+    body: { email, password },
   } = req;
+  console.log(email);
   try {
     const user = await userModel({ email });
     await userModel.register(user, password);
@@ -30,7 +31,7 @@ export const postLogout = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   const {
-    params: { id }
+    params: { id },
   } = req;
   //console.log(id);
   try {
@@ -41,7 +42,7 @@ export const getProfile = async (req, res) => {
       .populate("want_read.book")
       .populate({
         path: "reviews",
-        populate: { path: "book" }
+        populate: { path: "book" },
       })
       .populate("uploaded");
     res.status(200).json({ error: 0, user });
@@ -55,7 +56,7 @@ export const postProfile = passport.authenticate("jwt", { session: false });
 export const postEdit = async (req, res) => {
   const {
     body: { email, nickname, intro, website, interest },
-    file
+    file,
   } = req;
   try {
     const user = await userModel.findByUsername(email);
@@ -73,11 +74,10 @@ export const postEdit = async (req, res) => {
 
 export const postShelve = async (req, res) => {
   const {
-    body: { email, isbn, title, authors, type }
+    body: { email, id, type },
   } = req;
-  console.log(email);
   try {
-    const book = await bookModel.findOne({ isbn: isbn });
+    const book = await bookModel.findById(id);
     const user = await userModel
       .findByUsername(email)
       .populate("reading.book")
@@ -85,34 +85,34 @@ export const postShelve = async (req, res) => {
       .populate("want_read.book")
       .populate({
         path: "reviews",
-        populate: { path: "book" }
+        populate: { path: "book" },
       })
       .populate("uploaded");
     if (book) {
       if (user[type].indexOf(book._id) === -1) {
         if (type === "want_read") {
-          const reading = user["reading"].filter(item => {
+          const reading = user["reading"].filter((item) => {
             return String(item.book._id) !== String(book._id);
           });
-          const read = user["read"].filter(item => {
+          const read = user["read"].filter((item) => {
             return String(item.book._id) !== String(book._id);
           });
           user["reading"] = reading;
           user["read"] = read;
         } else if (type === "reading") {
-          const want_read = user["want_read"].filter(item => {
+          const want_read = user["want_read"].filter((item) => {
             return String(item.book.id) !== String(book._id);
           });
-          const read = user["read"].filter(item => {
+          const read = user["read"].filter((item) => {
             return String(item.book.id) !== String(book._id);
           });
           user["read"] = read;
           user["want_read"] = want_read;
         } else if (type === "read") {
-          const reading = user["reading"].filter(item => {
+          const reading = user["reading"].filter((item) => {
             return String(item.book.id) !== String(book._id);
           });
-          const want_read = user["want_read"].filter(item => {
+          const want_read = user["want_read"].filter((item) => {
             return String(item.book.id) !== String(book._id);
           });
           user["reading"] = reading;
@@ -121,14 +121,6 @@ export const postShelve = async (req, res) => {
         user[type].push({ book: book });
         user.save();
       }
-    } else {
-      const newBook = new bookModel();
-      newBook.title = title;
-      newBook.isbn = isbn;
-      newBook.authors = authors;
-      newBook.save();
-      user[type].push({ book: newBook });
-      user.save();
     }
     res.status(200).json({ error: 0, profile: user });
   } catch (error) {
@@ -139,7 +131,7 @@ export const postShelve = async (req, res) => {
 export const deleteShelve = async (req, res) => {
   const {
     body: { uid, type },
-    params: { id }
+    params: { id },
   } = req;
   try {
     const user = await userModel
@@ -149,10 +141,10 @@ export const deleteShelve = async (req, res) => {
       .populate("want_read.book")
       .populate({
         path: "reviews",
-        populate: { path: "book" }
+        populate: { path: "book" },
       })
       .populate("uploaded");
-    const newList = user[type].filter(item => {
+    const newList = user[type].filter((item) => {
       return String(item.book.id) !== String(id);
     });
     user[type] = newList;
@@ -170,7 +162,7 @@ export const deleteShelve = async (req, res) => {
  */
 export const postLike = async (req, res) => {
   const {
-    body: { id, type, uid, m_id } // id->review._id ,u_id -> user._id, m_id: my._id
+    body: { id, type, uid, m_id }, // id->review._id ,u_id -> user._id, m_id: my._id
   } = req;
   console.log();
   try {
@@ -181,7 +173,7 @@ export const postLike = async (req, res) => {
       .populate("want_read.book")
       .populate({
         path: "reviews",
-        populate: { path: "book" }
+        populate: { path: "book" },
       })
       .populate("uploaded");
     const review = await reviewModel.findById(id);
@@ -221,14 +213,11 @@ export const getReviews = async (req, res) => {
 
 export const getTopReaders = async (req, res) => {
   const {
-    params: { type }
+    params: { type },
   } = req;
   try {
     if (parseInt(type) === 0) {
-      const readers = await userModel
-        .find()
-        .sort({ read: -1 })
-        .limit(10);
+      const readers = await userModel.find().sort({ read: -1 }).limit(10);
       res.status(200).json({ error: 0, readers: readers });
     } else if (parseInt(type) === 1) {
       const currentDate = moment();
@@ -238,8 +227,8 @@ export const getTopReaders = async (req, res) => {
       const readers = await userModel.find({
         "read.createdAt": {
           $gte: weekStart.toDate(),
-          $lte: weekEnd.toDate()
-        }
+          $lte: weekEnd.toDate(),
+        },
       });
       console.log(readers);
       res.status(200).json({ error: 0, readers: readers });
@@ -248,7 +237,7 @@ export const getTopReaders = async (req, res) => {
       const end = moment().endOf("month");
       const readers = await userModel
         .find({
-          "read.createdAt": { $gte: start.toDate(), $lte: end.toDate() }
+          "read.createdAt": { $gte: start.toDate(), $lte: end.toDate() },
         })
         .limit(10)
         .sort({ read: -1 });
@@ -264,15 +253,12 @@ export const getTopReaders = async (req, res) => {
 };
 export const getTopReviewers = async (req, res) => {
   const {
-    params: { type }
+    params: { type },
   } = req;
   try {
     if (parseInt(type) === 0) {
       //all, 전체
-      const reviewers = await userModel
-        .find()
-        .sort({ reviews: -1 })
-        .limit(10);
+      const reviewers = await userModel.find().sort({ reviews: -1 }).limit(10);
       res.status(200).json({ error: 0, reviewers });
     } else if (parseInt(type) === 1) {
       //this week, 이번주
