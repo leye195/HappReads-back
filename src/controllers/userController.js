@@ -45,7 +45,7 @@ export const getProfile = async (req, res) => {
         populate: { path: "book" },
       })
       .populate("uploaded");
-    res.status(200).json({ error: 0, user });
+    res.status(200).json({ error: 0, user: user });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: 1 });

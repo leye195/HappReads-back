@@ -3,32 +3,35 @@ import mongoose from "mongoose";
 const bookSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: "title required"
+    required: "title required",
   },
-  /*contents: {
+  contents: {
     type: String,
-    required: "contents required"
-  },*/
+    required: "contents required",
+  },
   thumbnail: {
     type: String,
     default:
-      "https://happreads.s3.ap-northeast-2.amazonaws.com/covers/placeholder-book-cover-default.png"
+      "https://happreads.s3.ap-northeast-2.amazonaws.com/covers/placeholder-book-cover-default.png",
   },
   authors: [],
+  genres: {
+    type: String,
+  },
   isbn: {
-    type: String
+    type: String,
   },
   review: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Review"
-    }
+      ref: "Review",
+    },
   ],
   votes: [], //[{vote point, user._id}
   createdAt: {
     type: Date,
-    default: Date.now()
-  }
+    default: Date.now(),
+  },
 });
 const bookModel = mongoose.model("Book", bookSchema);
 export default bookModel;

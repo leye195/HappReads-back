@@ -76,7 +76,7 @@ export const getBook = async (req, res) => {
  */
 export const postBook = async (req, res) => {
   const {
-    body: { title, authors, isbn, contents, uid },
+    body: { title, authors, isbn, contents, uid, genres },
     file,
   } = req;
   //console.log(file);
@@ -88,6 +88,7 @@ export const postBook = async (req, res) => {
     book.isbn = isbn;
     book.contents = contents;
     book.thumbnail = file.location; //book.thunbnail=thumbnail;
+    book.genres = genres;
     book.save();
     user.uploaded.push(book.id);
     user.save();
@@ -184,12 +185,10 @@ export const postReview = async (req, res) => {
     book.save();
     newReview = await newReview.populate("reviewer").execPopulate();
     //console.log(newReview);
-    res
-      .status(200)
-      .json({
-        error: 0,
-        reviews: [...book.review.splice(0, book.review.length - 1), newReview],
-      });
+    res.status(200).json({
+      error: 0,
+      reviews: [...book.review.splice(0, book.review.length - 1), newReview],
+    });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: 1 });

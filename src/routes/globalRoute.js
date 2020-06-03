@@ -42,7 +42,7 @@ app.post(routes.logout, postLogout);
 app.get(`${routes.profile}/:id`, getProfile);
 app.post(routes.profile, postProfile, (req, res) => {
   const { user } = req;
-  res.status(200).json({ profile: user });
+  res.status(200).json({ user });
 });
 app.post(routes.edit, uploadAvatarMiddleware, postEdit);
 
