@@ -33,7 +33,7 @@ export const getProfile = async (req, res) => {
   const {
     params: { id },
   } = req;
-  //console.log(id);
+
   try {
     const user = await userModel
       .findById(id)
@@ -76,6 +76,7 @@ export const postShelve = async (req, res) => {
   const {
     body: { email, id, type },
   } = req;
+  //console.log(email, id, type);
   try {
     const book = await bookModel.findById(id);
     const user = await userModel
@@ -119,12 +120,11 @@ export const postShelve = async (req, res) => {
           user["want_read"] = want_read;
         }
         user[type].push({ book: book });
-        console.log(user[type]);
+        //console.log(user[type]);
         user.save();
       }
     }
-    //console.log(user);
-    res.status(200).json({ error: 0, profile: user });
+    res.status(200).json({ error: 0, user });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: 1 });
@@ -232,7 +232,7 @@ export const getTopReaders = async (req, res) => {
           $lte: weekEnd.toDate(),
         },
       });
-      console.log(readers);
+      //console.log(readers);
       res.status(200).json({ error: 0, readers: readers });
     } else if (parseInt(type) === 2) {
       const start = moment().startOf("month");

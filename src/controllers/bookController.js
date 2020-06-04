@@ -53,13 +53,18 @@ export const getBook = async (req, res) => {
     params: { id },
   } = req;
   try {
-    const book = await bookModel.findById(id).populate({
-      path: "review",
-      populate: {
-        path: "reviewer",
-        model: userModel,
-      },
-    });
+    const book = await bookModel
+      .findById(id)
+      .populate({
+        path: "review",
+        populate: {
+          path: "reviewer",
+          model: userModel,
+        },
+      })
+      .populate({
+        path: "votes.voter",
+      });
     console.log(book);
     if (book)
       res
@@ -117,7 +122,7 @@ export const postRate = async (req, res) => {
       if (book.votes.length > 0) {
         let idx = -1;
         for (let i = 0; i < book.votes.length; i++) {
-          if (String(book.votes[i]._id) === String(user._id)) {
+          if (String(book.votes[i].voter) === String(user._id)) {
             idx = i;
             break;
           }
@@ -125,7 +130,8 @@ export const postRate = async (req, res) => {
         if (idx !== -1) book.votes.splice(idx, 1);
         //유저가 예전에 이미 평점을 부여했을 경우 전에 부여했던 기록을 지우고 새로운 평가 점수를 추가
       }
-      book.votes.push({ vote: vote, _id: user._id }); //{vote point, user._id}
+      console.log(typeof vote);
+      book.votes.push({ vote: vote, voter: user._id }); //{vote point, user._id}
       book.save();
       user.votes.push(book.id);
       user.save();

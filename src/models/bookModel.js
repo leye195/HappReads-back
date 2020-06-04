@@ -27,7 +27,18 @@ const bookSchema = new mongoose.Schema({
       ref: "Review",
     },
   ],
-  votes: [], //[{vote point, user._id}
+  votes: [
+    {
+      vote: {
+        type: String,
+        default: "0",
+      },
+      voter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  ], //[{vote point, user._id}
   createdAt: {
     type: Date,
     default: Date.now(),
