@@ -23,8 +23,8 @@ import {
 } from "../controllers/bookController";
 const app = express.Router();
 
-app.get(routes.books, getBooks);
-app.get(routes.books + `/search`, getBookSearch);
+app.get(`${routes.books}/:type`, getBooks);
+app.get(`/search`, getBookSearch);
 
 app.get(routes.reviews, getReviews);
 

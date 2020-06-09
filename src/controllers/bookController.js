@@ -2,21 +2,40 @@ import reviewModel from "../models/reviewModel";
 import bookModel from "../models/bookModel";
 import userModel from "../models/userModel";
 /**
- * GET /books
+ * GET /books/:type?page={page}
  * @param {*} req
  * @param {*} res
  */
+//
 export const getBooks = async (req, res) => {
   try {
-    const books = await bookModel.find().sort({ _id: -1 });
-    res.status(200).json({ error: 0, books });
+    const {
+      params: { type },
+      query: { page },
+    } = req;
+    //console.log(req);
+    let books = [];
+    if (type === "전체") {
+      books = await bookModel
+        .find()
+        .sort({ _id: -1 })
+        .skip((parseInt(page, 10) - 1) * 15)
+        .limit(15);
+    } else {
+      books = await bookModel
+        .find({ genres: { $regex: type } })
+        .sort({ _id: -1 })
+        .skip((parseInt(page, 10) - 1) * 15)
+        .limit(15);
+    }
+    res.status(200).json({ error: 0, books, page: parseInt(page, 10) });
   } catch (error) {
     res.status(400).json({ error: 1 });
   }
 };
 
 /*
- *GET /books/search?q={}&type={}
+ *GET /search?q={q}&type={type}
  * @param {*} req
  * @param {*} res
  */
@@ -26,7 +45,7 @@ export const getBookSearch = async (req, res) => {
     const {
       query: { q, type },
     } = req;
-    console.log(q, parseInt(type) === 0);
+    //console.log(req);
     let books = [];
     if (parseInt(type) === 0) {
       books = await bookModel
@@ -37,6 +56,7 @@ export const getBookSearch = async (req, res) => {
     } else if (parseInt(type) === 2) {
       books = await bookModel.find({ authors: { $regex: q } });
     }
+    console.log(books);
     res.json({ books, error: 0 });
   } catch (e) {
     res.json({ books: [], error: 1 });
@@ -65,7 +85,7 @@ export const getBook = async (req, res) => {
       .populate({
         path: "votes.voter",
       });
-    console.log(book);
+    //console.log(book);
     if (book)
       res
         .status(200)
@@ -114,27 +134,31 @@ export const postRate = async (req, res) => {
     body: { vote, name },
     params: { id },
   } = req;
-  console.log(id, vote, name);
+  //console.log(id, vote, name);
   try {
     const user = await userModel.findByUsername(name);
-    const book = await bookModel.findById(id);
+    let book = await bookModel.findById(id).populate({
+      path: "votes.voter",
+    });
     if (book !== null) {
       if (book.votes.length > 0) {
         let idx = -1;
         for (let i = 0; i < book.votes.length; i++) {
-          if (String(book.votes[i].voter) === String(user._id)) {
+          //console.log(book.votes[i].voter._id, user._id);
+          if (String(book.votes[i].voter._id) === String(user._id)) {
             idx = i;
+            console.log(idx);
             break;
           }
         }
         if (idx !== -1) book.votes.splice(idx, 1);
         //유저가 예전에 이미 평점을 부여했을 경우 전에 부여했던 기록을 지우고 새로운 평가 점수를 추가
       }
-      console.log(typeof vote);
-      book.votes.push({ vote: vote, voter: user._id }); //{vote point, user._id}
+      book.votes.push({ vote: vote, voter: user }); //{vote point, user._id}
       book.save();
       user.votes.push(book.id);
       user.save();
+      console.log(book);
       res.status(200).json({ error: 0, book });
     }
   } catch (error) {
@@ -205,44 +229,46 @@ export const postReview = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-export const deleteReview = async (req, res) => {
+export const deleteReview = async (req, res, next) => {
   const {
-    params: { isbn, rid },
-    body: { uid, from },
+    params: { id, rid },
+    body: { uid },
   } = req;
   try {
-    console.log(uid, bid, rid);
-    const review = await reviewModel.findByIdAndDelete(rid);
-    const book = await bookModel.findOne({ isbn: isbn }).populate("review");
-    const user = await userModel
-      .findById(uid)
-      .populate("reading.book")
-      .populate("read.book")
-      .populate("want_read.book")
-      .populate({
-        path: "reviews",
-        populate: { path: "book" },
-      })
-      .populate("uploaded");
-    const cleanedBookReviews = book.review.filter((review) => {
-      return String(review.id) !== String(rid);
-    });
-    const cleanedReviews = user.reviews.filter((review) => {
-      return String(review.id) !== String(rid);
-    });
-    book.review = cleanedBookReviews;
-    user.reviews = cleanedReviews;
-    book.save();
-    user.save();
-    if (from === "profile") {
-      res.status(200).json({ error: 0, profile: user });
-    } else if (from === "book") {
-      res.status(200).json({ error: 0, reviews: book.review });
+    console.log(uid, id, rid);
+    if (id && uid && rid) {
+      await reviewModel.findByIdAndDelete(rid);
+      const book = await bookModel.findById(id).populate("review");
+      const user = await userModel
+        .findById(uid)
+        .populate("reading.book")
+        .populate("read.book")
+        .populate("want_read.book")
+        .populate({
+          path: "reviews",
+          populate: { path: "book" },
+        })
+        .populate("uploaded")
+        .populate("likes");
+      const cleanedBookReviews = book.review.filter((review) => {
+        return String(review.id) !== String(rid);
+      });
+      const cleanedReviews = user.reviews.filter((review) => {
+        return String(review.id) !== String(rid);
+      });
+      //console.log(cleanedBookReviews, cleanedReviews);
+      book.review = cleanedBookReviews;
+      user.reviews = cleanedReviews;
+      book.save();
+      user.save();
+      console.log(user);
+      res.status(200).json({ error: 0, user });
     } else {
-      throw error("from should be profile or book");
+      res.status(403).end();
     }
   } catch (error) {
     console.log(error);
+    next(error);
   }
 };
 export const editReview = async (req, res) => {

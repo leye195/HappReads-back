@@ -3,26 +3,28 @@ import mongoose from "mongoose";
 const reviewSchema = new mongoose.Schema({
   reviewer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    ref: "User",
   },
   book: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Book"
+    ref: "Book",
   },
   isbn: {
-    type: String
+    type: String,
   },
   content: {
-    type: String
+    type: String,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
-  likes: {
-    type: Number,
-    default: 0
-  }
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 const reviewModel = mongoose.model("Review", reviewSchema);
 export default reviewModel;

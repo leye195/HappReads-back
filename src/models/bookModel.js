@@ -7,7 +7,6 @@ const bookSchema = new mongoose.Schema({
   },
   contents: {
     type: String,
-    required: "contents required",
   },
   thumbnail: {
     type: String,

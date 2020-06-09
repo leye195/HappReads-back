@@ -164,9 +164,9 @@ export const deleteShelve = async (req, res) => {
  */
 export const postLike = async (req, res) => {
   const {
-    body: { id, type, uid, m_id }, // id->review._id ,u_id -> user._id, m_id: my._id
+    body: { id, type, uid }, // id->review._id ,u_id -> user._id, m_id: my._id
   } = req;
-  console.log();
+  console.log(req.body);
   try {
     const user = await userModel
       .findById(uid)
@@ -177,18 +177,31 @@ export const postLike = async (req, res) => {
         path: "reviews",
         populate: { path: "book" },
       })
-      .populate("uploaded");
-    const review = await reviewModel.findById(id);
-    for (let i = 0; i < user.reviews.length; i++) {
-      if (String(user.reviews[i]._id) === String(review._id)) {
-        user.reviews[i].likes += 1;
-        review.likes += 1;
+      .populate("uploaded")
+      .populate("likes");
+    const review = await reviewModel
+      .findById(id)
+      .populate("reviewer")
+      .populate("likes");
+
+    let idx = -1;
+    //toggle like review
+    for (let i = 0; i < review.likes.length; i++) {
+      if (String(review.likes[i]._id) === String(user._id)) {
+        idx = i;
         break;
       }
     }
+    if (idx !== -1) {
+      //cancel like review
+      review.likes.splice(idx, 1);
+    } else {
+      //like review
+      review.likes.push(user);
+    }
     user.save();
     review.save();
-    res.status(200).json({ error: 0, profile: user });
+    res.status(200).json({ error: 0, review });
   } catch (error) {
     console.log(error);
     res.status(400).end();
