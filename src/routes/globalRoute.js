@@ -19,12 +19,14 @@ import { uploadAvatarMiddleware, uploadCoverMiddleware } from "../middlewares";
 import {
   postBook,
   getBooks,
-  getBookSearch,
+  getRecentBooks,
+  getPopularBooks,
 } from "../controllers/bookController";
 const app = express.Router();
 
-app.get(`${routes.books}/:type`, getBooks);
-app.get(`/search`, getBookSearch);
+app.get(`${routes.books}/type/:type`, getBooks);
+app.get(`${routes.books}/recent`, getRecentBooks);
+app.get(`${routes.books}/popular`, getPopularBooks);
 
 app.get(routes.reviews, getReviews);
 

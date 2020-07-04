@@ -15,7 +15,7 @@ export const postSignUp = async (req, res) => {
   const {
     body: { email, password },
   } = req;
-  console.log(email);
+  //console.log(email);
   try {
     const user = await userModel({ email });
     await userModel.register(user, password);
@@ -76,7 +76,7 @@ export const postShelve = async (req, res) => {
   const {
     body: { email, id, type },
   } = req;
-  //console.log(email, id, type);
+  console.log(email, id, type);
   try {
     const book = await bookModel.findById(id);
     const user = await userModel
@@ -90,7 +90,10 @@ export const postShelve = async (req, res) => {
       })
       .populate("uploaded");
     if (book) {
-      if (user[type].indexOf(book._id) === -1) {
+      const checkList = user[type].filter(
+        (item) => String(item.book._id) === String(book._id)
+      );
+      if (checkList.length === 0) {
         if (type === "want_read") {
           const reading = user["reading"].filter((item) => {
             return String(item.book._id) !== String(book._id);
@@ -120,7 +123,6 @@ export const postShelve = async (req, res) => {
           user["want_read"] = want_read;
         }
         user[type].push({ book: book });
-        //console.log(user[type]);
         user.save();
       }
     }
@@ -134,7 +136,7 @@ export const deleteShelve = async (req, res) => {
   const {
     body: { uid, type, id },
   } = req;
-  console.log();
+  console.log(uid, type, id);
   try {
     const user = await userModel
       .findById(uid)
@@ -147,11 +149,11 @@ export const deleteShelve = async (req, res) => {
       })
       .populate("uploaded");
     const newList = user[type].filter((item) => {
-      return item.book !== null && String(item.book.id) !== String(id);
+      return item.book !== null && String(item._id) !== String(id);
     });
     user[type] = newList;
     user.save();
-    res.status(200).json({ error: 0, profile: user });
+    res.status(200).json({ error: 0, user });
   } catch (error) {
     console.log(error);
     res.status(400).end();

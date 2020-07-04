@@ -35,11 +35,74 @@ export const getBooks = async (req, res) => {
 };
 
 /*
+ *GET /sliders
+ * @param {*} req
+ * @param {*} res
+ */
+export const getSliderBooks = async (req, res, next) => {
+  try {
+    const books = await bookModel.find(),
+      sliderBooks = [];
+    while (sliderBooks.length !== 8) {
+      const book = books[(books.length * Math.random()) | 0];
+      if (!sliderBooks.includes(book)) sliderBooks.push(book);
+    }
+    res.status(200).json({ books: sliderBooks });
+  } catch (e) {
+    next(e);
+  }
+};
+
+/*
+ *GET /popular
+ * @param {*} req
+ * @param {*} res
+ */
+export const getPopularBooks = async (req, res, next) => {
+  try {
+    const books = await bookModel.find().populate({
+      path: "votes.voter",
+    });
+    const newBooks = books
+      .filter((book) => book.votes.length >= 1) //최소 한번은 평가 되어야 들어감
+      .map((book) => {
+        return {
+          ...book._doc,
+          avg_vote:
+            book.votes && book.votes.length > 0
+              ? (
+                  book.votes.reduce((x, y) => x + parseFloat(y.vote), 0) /
+                  book.votes.length
+                ).toFixed(2)
+              : 0,
+        };
+      })
+      .sort((x, y) => y.avg_vote - x.avg_vote);
+    res.status(200).json(newBooks);
+  } catch (e) {
+    next(e);
+  }
+};
+
+/*
+ *GET /recent
+ * @param {*} req
+ * @param {*} res
+ */
+export const getRecentBooks = async (req, res, next) => {
+  try {
+    const books = await bookModel.find().sort({ createdAt: -1 });
+    res.status(200).json(books);
+  } catch (e) {
+    next(e);
+  }
+};
+
+/*
  *GET /search?q={q}&type={type}
  * @param {*} req
  * @param {*} res
  */
-
 export const getBookSearch = async (req, res) => {
   try {
     const {
@@ -101,7 +164,7 @@ export const getBook = async (req, res) => {
  */
 export const postBook = async (req, res) => {
   const {
-    body: { title, authors, isbn, contents, uid, genres },
+    body: { title, authors, contents, uid, genres },
     file,
   } = req;
   //console.log(file);
@@ -110,7 +173,6 @@ export const postBook = async (req, res) => {
     const user = await userModel.findById(uid);
     book.title = title;
     book.authors.push(authors);
-    book.isbn = isbn;
     book.contents = contents;
     book.thumbnail = file.location; //book.thunbnail=thumbnail;
     book.genres = genres;

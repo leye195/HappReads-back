@@ -32,6 +32,10 @@ const bookSchema = new mongoose.Schema({
         type: String,
         default: "0",
       },
+      createdAt: {
+        type: Date,
+        default: Date.now(),
+      },
       voter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
