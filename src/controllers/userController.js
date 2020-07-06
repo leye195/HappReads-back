@@ -1,10 +1,11 @@
 import userModel from "../models/userModel";
 import passport from "passport";
 import routes from "../routes";
-import dotenv from "dotenv";
 import bookModel from "../models/bookModel";
 import reviewModel from "../models/reviewModel";
 import moment from "moment";
+import dotenv from "dotenv";
+import "@babel/polyfill";
 dotenv.config();
 export const postLogin = passport.authenticate("local", {
   session: false, //won't save user in session
@@ -15,7 +16,6 @@ export const postSignUp = async (req, res) => {
   const {
     body: { email, password },
   } = req;
-  //console.log(email);
   try {
     const user = await userModel({ email });
     await userModel.register(user, password);
@@ -216,11 +216,18 @@ export const postLike = async (req, res) => {
  */
 export const getReviews = async (req, res) => {
   try {
+    const {
+      query: { limit, page },
+    } = req;
+    console.log(page, limit, page * limit);
     const reviews = await reviewModel
       .find()
       .populate("book")
       .populate("reviewer")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(parseInt(limit) * (parseInt(page) - 1))
+      .limit(parseInt(limit));
+    console.log(reviews.length);
     res.status(200).json({ error: 0, reviews });
   } catch (error) {
     console.log(error);
