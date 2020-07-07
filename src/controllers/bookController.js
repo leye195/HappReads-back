@@ -13,7 +13,6 @@ export const getBooks = async (req, res) => {
       params: { type },
       query: { page },
     } = req;
-    //console.log(req);
     let books = [];
     if (type === "전체") {
       books = await bookModel
@@ -31,6 +30,23 @@ export const getBooks = async (req, res) => {
     res.status(200).json({ error: 0, books, page: parseInt(page, 10) });
   } catch (error) {
     res.status(400).json({ error: 1 });
+  }
+};
+
+export const editBook = async (req, res, next) => {
+  try {
+    const {
+      body: { title, contents, genres },
+      params: { id },
+    } = req;
+    const book = await bookModel.findByIdAndUpdate(id, {
+      title,
+      contents,
+      genres,
+    });
+    res.status(200).json({});
+  } catch (e) {
+    next(e);
   }
 };
 
@@ -108,7 +124,6 @@ export const getBookSearch = async (req, res) => {
     const {
       query: { q, type },
     } = req;
-    //console.log(req);
     let books = [];
     if (parseInt(type) === 0) {
       books = await bookModel
@@ -148,7 +163,6 @@ export const getBook = async (req, res) => {
       .populate({
         path: "votes.voter",
       });
-    //console.log(book);
     if (book)
       res
         .status(200)
@@ -206,7 +220,6 @@ export const postRate = async (req, res) => {
       if (book.votes.length > 0) {
         let idx = -1;
         for (let i = 0; i < book.votes.length; i++) {
-          //console.log(book.votes[i].voter._id, user._id);
           if (String(book.votes[i].voter._id) === String(user._id)) {
             idx = i;
             console.log(idx);

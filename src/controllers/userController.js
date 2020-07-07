@@ -76,7 +76,6 @@ export const postShelve = async (req, res) => {
   const {
     body: { email, id, type },
   } = req;
-  console.log(email, id, type);
   try {
     const book = await bookModel.findById(id);
     const user = await userModel
@@ -168,7 +167,6 @@ export const postLike = async (req, res) => {
   const {
     body: { id, type, uid }, // id->review._id ,u_id -> user._id, m_id: my._id
   } = req;
-  console.log(req.body);
   try {
     const user = await userModel
       .findById(uid)
@@ -183,9 +181,9 @@ export const postLike = async (req, res) => {
       .populate("likes");
     const review = await reviewModel
       .findById(id)
+      .populate("book")
       .populate("reviewer")
       .populate("likes");
-
     let idx = -1;
     //toggle like review
     for (let i = 0; i < review.likes.length; i++) {
@@ -219,7 +217,7 @@ export const getReviews = async (req, res) => {
     const {
       query: { limit, page },
     } = req;
-    console.log(page, limit, page * limit);
+    //console.log(page, limit, page * limit);
     const reviews = await reviewModel
       .find()
       .populate("book")
@@ -227,8 +225,7 @@ export const getReviews = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(parseInt(limit) * (parseInt(page) - 1))
       .limit(parseInt(limit));
-    console.log(reviews.length);
-    res.status(200).json({ error: 0, reviews });
+    res.status(200).json({ error: 0, reviews, page });
   } catch (error) {
     console.log(error);
     res.status(404).json({ error: 1 });
@@ -247,7 +244,7 @@ export const getTopReaders = async (req, res) => {
       const currentDate = moment();
       const weekStart = currentDate.clone().startOf("week");
       const weekEnd = currentDate.clone().endOf("week");
-      console.log(weekStart.toDate(), weekEnd.toDate());
+      //console.log(weekStart.toDate(), weekEnd.toDate());
       const readers = await userModel.find({
         "read.createdAt": {
           $gte: weekStart.toDate(),
