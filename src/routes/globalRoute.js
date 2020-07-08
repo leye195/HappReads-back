@@ -23,7 +23,7 @@ import {
   getPopularBooks,
 } from "../controllers/bookController";
 const app = express.Router();
-
+app.get("/", (req, res) => [res.send("happreads API")]);
 app.get(`${routes.books}/type/:type`, getBooks);
 app.get(`${routes.books}/recent`, getRecentBooks);
 app.get(`${routes.books}/popular`, getPopularBooks);

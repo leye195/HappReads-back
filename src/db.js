@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
-/*console.log(
-  process.env.PRODUCTION
-    ? process.env.MONGO_URL_HEROKU
-    : process.env.MONGO_URL_DEV
-);*/
 mongoose.connect(
   process.env.PRODUCTION
     ? process.env.MONGO_URL_PRO
