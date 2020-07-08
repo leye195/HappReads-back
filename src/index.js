@@ -21,6 +21,6 @@ app.use(passport.initialize());
 app.use(routes.home, globalRoute);
 app.use(routes.book, bookRoute);
 
-app.listen(8080, () => {
-  console.log("listening on port 8080");
+app.listen(process.env.PORT || 8000, () => {
+  console.log(`listening on port ${process.env.PORT || 8000}`);
 });
