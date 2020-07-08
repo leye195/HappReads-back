@@ -68,10 +68,10 @@ export const getSliderBooks = async (req, res, next) => {
         const book = books[(books.length * Math.random()) | 0];
         if (!sliderBooks.includes(book)) sliderBooks.push(book);
       }
+      res.status(200).json({ books: sliderBooks });
     } else {
-      sliderBooks = book;
+      res.status(200).json({ books });
     }
-    res.status(200).json({ books: sliderBooks });
   } catch (e) {
     next(e);
   }
