@@ -63,9 +63,13 @@ export const getSliderBooks = async (req, res, next) => {
   try {
     const books = await bookModel.find(),
       sliderBooks = [];
-    while (sliderBooks.length !== 8) {
-      const book = books[(books.length * Math.random()) | 0];
-      if (!sliderBooks.includes(book)) sliderBooks.push(book);
+    if (sliderBooks.lenght >= 8) {
+      while (sliderBooks.length !== 8) {
+        const book = books[(books.length * Math.random()) | 0];
+        if (!sliderBooks.includes(book)) sliderBooks.push(book);
+      }
+    } else {
+      sliderBooks = book;
     }
     res.status(200).json({ books: sliderBooks });
   } catch (e) {
