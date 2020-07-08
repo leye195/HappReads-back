@@ -6,7 +6,6 @@ import userModel from "../models/userModel";
  * @param {*} req
  * @param {*} res
  */
-//
 export const getBooks = async (req, res) => {
   try {
     const {
@@ -33,18 +32,23 @@ export const getBooks = async (req, res) => {
   }
 };
 
+/**
+ * PUT /book/:id
+ * @param {*} req
+ * @param {*} res
+ */
 export const editBook = async (req, res, next) => {
   try {
     const {
       body: { title, contents, genres },
       params: { id },
     } = req;
-    const book = await bookModel.findByIdAndUpdate(id, {
+    await bookModel.findByIdAndUpdate(id, {
       title,
       contents,
       genres,
     });
-    res.status(200).json({});
+    res.status(200).end();
   } catch (e) {
     next(e);
   }

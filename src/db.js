@@ -1,15 +1,26 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
-mongoose.connect(process.env.MONGO_URL_DEV, {
-  useNewUrlParser: true,
-  useFindAndModify: false
-});
+/*console.log(
+  process.env.PRODUCTION
+    ? process.env.MONGO_URL_HEROKU
+    : process.env.MONGO_URL_DEV
+);*/
+mongoose.connect(
+  process.env.PRODUCTION
+    ? process.env.MONGO_URL_PRO
+    : process.env.MONGO_URL_DEV,
+  {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+  }
+);
 const db = mongoose.connection;
 const handleOpen = () => {
   console.log("Connect to MongoDB");
 };
-const handleError = error => {
+const handleError = (error) => {
   console.log(`Error on DB Connection: ${error}`);
 };
 db.once("open", handleOpen);

@@ -19,6 +19,7 @@ app.get("/search", _bookController.getBookSearch);
 app.get("/sliders", _bookController.getSliderBooks);
 app.post("".concat(_routes["default"].review, "/:rid"), _bookController.editReview);
 app.get("/:id", _bookController.getBook);
+app.put("/:id", _bookController.editBook);
 app.post("/:id", _bookController.postRate);
 app.get("/:id".concat(_routes["default"].review), _bookController.getReview);
 app["delete"]("/:id".concat(_routes["default"].review, "/:rid"), _bookController.deleteReview);

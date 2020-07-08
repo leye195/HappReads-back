@@ -245,14 +245,13 @@ function () {
         switch (_context5.prev = _context5.next) {
           case 0:
             _req$body3 = req.body, email = _req$body3.email, id = _req$body3.id, type = _req$body3.type;
-            console.log(email, id, type);
-            _context5.prev = 2;
-            _context5.next = 5;
+            _context5.prev = 1;
+            _context5.next = 4;
             return _bookModel["default"].findById(id);
 
-          case 5:
+          case 4:
             book = _context5.sent;
-            _context5.next = 8;
+            _context5.next = 7;
             return _userModel["default"].findByUsername(email).populate("reading.book").populate("read.book").populate("want_read.book").populate({
               path: "reviews",
               populate: {
@@ -260,7 +259,7 @@ function () {
               }
             }).populate("uploaded");
 
-          case 8:
+          case 7:
             user = _context5.sent;
 
             if (book) {
@@ -309,23 +308,23 @@ function () {
               error: 0,
               user: user
             });
-            _context5.next = 17;
+            _context5.next = 16;
             break;
 
-          case 13:
-            _context5.prev = 13;
-            _context5.t0 = _context5["catch"](2);
+          case 12:
+            _context5.prev = 12;
+            _context5.t0 = _context5["catch"](1);
             console.log(_context5.t0);
             res.status(400).json({
               error: 1
             });
 
-          case 17:
+          case 16:
           case "end":
             return _context5.stop();
         }
       }
-    }, _callee5, null, [[2, 13]]);
+    }, _callee5, null, [[1, 12]]);
   }));
 
   return function postShelve(_x9, _x10) {
@@ -412,9 +411,8 @@ function () {
         switch (_context7.prev = _context7.next) {
           case 0:
             _req$body5 = req.body, id = _req$body5.id, type = _req$body5.type, uid = _req$body5.uid;
-            console.log(req.body);
-            _context7.prev = 2;
-            _context7.next = 5;
+            _context7.prev = 1;
+            _context7.next = 4;
             return _userModel["default"].findById(uid).populate("reading.book").populate("read.book").populate("want_read.book").populate({
               path: "reviews",
               populate: {
@@ -422,37 +420,37 @@ function () {
               }
             }).populate("uploaded").populate("likes");
 
-          case 5:
+          case 4:
             user = _context7.sent;
-            _context7.next = 8;
-            return _reviewModel["default"].findById(id).populate("reviewer").populate("likes");
+            _context7.next = 7;
+            return _reviewModel["default"].findById(id).populate("book").populate("reviewer").populate("likes");
 
-          case 8:
+          case 7:
             review = _context7.sent;
             idx = -1; //toggle like review
 
             i = 0;
 
-          case 11:
+          case 10:
             if (!(i < review.likes.length)) {
-              _context7.next = 18;
+              _context7.next = 17;
               break;
             }
 
             if (!(String(review.likes[i]._id) === String(user._id))) {
-              _context7.next = 15;
+              _context7.next = 14;
               break;
             }
 
             idx = i;
-            return _context7.abrupt("break", 18);
+            return _context7.abrupt("break", 17);
 
-          case 15:
+          case 14:
             i++;
-            _context7.next = 11;
+            _context7.next = 10;
             break;
 
-          case 18:
+          case 17:
             if (idx !== -1) {
               //cancel like review
               review.likes.splice(idx, 1);
@@ -467,21 +465,21 @@ function () {
               error: 0,
               review: review
             });
-            _context7.next = 28;
+            _context7.next = 27;
             break;
 
-          case 24:
-            _context7.prev = 24;
-            _context7.t0 = _context7["catch"](2);
+          case 23:
+            _context7.prev = 23;
+            _context7.t0 = _context7["catch"](1);
             console.log(_context7.t0);
             res.status(400).end();
 
-          case 28:
+          case 27:
           case "end":
             return _context7.stop();
         }
       }
-    }, _callee7, null, [[2, 24]]);
+    }, _callee7, null, [[1, 23]]);
   }));
 
   return function postLike(_x13, _x14) {
@@ -510,37 +508,37 @@ function () {
         switch (_context8.prev = _context8.next) {
           case 0:
             _context8.prev = 0;
-            _req$query = req.query, limit = _req$query.limit, page = _req$query.page;
-            console.log(page, limit, page * limit);
-            _context8.next = 5;
+            _req$query = req.query, limit = _req$query.limit, page = _req$query.page; //console.log(page, limit, page * limit);
+
+            _context8.next = 4;
             return _reviewModel["default"].find().populate("book").populate("reviewer").sort({
               createdAt: -1
             }).skip(parseInt(limit) * (parseInt(page) - 1)).limit(parseInt(limit));
 
-          case 5:
+          case 4:
             reviews = _context8.sent;
-            console.log(reviews.length);
             res.status(200).json({
               error: 0,
-              reviews: reviews
+              reviews: reviews,
+              page: page
             });
-            _context8.next = 14;
+            _context8.next = 12;
             break;
 
-          case 10:
-            _context8.prev = 10;
+          case 8:
+            _context8.prev = 8;
             _context8.t0 = _context8["catch"](0);
             console.log(_context8.t0);
             res.status(404).json({
               error: 1
             });
 
-          case 14:
+          case 12:
           case "end":
             return _context8.stop();
         }
       }
-    }, _callee8, null, [[0, 10]]);
+    }, _callee8, null, [[0, 8]]);
   }));
 
   return function getReviews(_x15, _x16) {
@@ -581,20 +579,20 @@ function () {
               error: 0,
               readers: readers
             });
-            _context9.next = 31;
+            _context9.next = 30;
             break;
 
           case 9:
             if (!(parseInt(type) === 1)) {
-              _context9.next = 20;
+              _context9.next = 19;
               break;
             }
 
             currentDate = (0, _moment["default"])();
             weekStart = currentDate.clone().startOf("week");
-            weekEnd = currentDate.clone().endOf("week");
-            console.log(weekStart.toDate(), weekEnd.toDate());
-            _context9.next = 16;
+            weekEnd = currentDate.clone().endOf("week"); //console.log(weekStart.toDate(), weekEnd.toDate());
+
+            _context9.next = 15;
             return _userModel["default"].find({
               "read.createdAt": {
                 $gte: weekStart.toDate(),
@@ -602,25 +600,25 @@ function () {
               }
             });
 
-          case 16:
+          case 15:
             _readers = _context9.sent;
             //console.log(readers);
             res.status(200).json({
               error: 0,
               readers: _readers
             });
-            _context9.next = 31;
+            _context9.next = 30;
             break;
 
-          case 20:
+          case 19:
             if (!(parseInt(type) === 2)) {
-              _context9.next = 30;
+              _context9.next = 29;
               break;
             }
 
             start = (0, _moment["default"])().startOf("month");
             end = (0, _moment["default"])().endOf("month");
-            _context9.next = 25;
+            _context9.next = 24;
             return _userModel["default"].find({
               "read.createdAt": {
                 $gte: start.toDate(),
@@ -630,37 +628,37 @@ function () {
               read: -1
             });
 
-          case 25:
+          case 24:
             _readers2 = _context9.sent;
             console.log(_readers2);
             res.status(200).json({
               error: 0,
               readers: _readers2
             });
-            _context9.next = 31;
+            _context9.next = 30;
             break;
 
-          case 30:
+          case 29:
             throw error("type should be between 0~2");
 
-          case 31:
-            _context9.next = 37;
+          case 30:
+            _context9.next = 36;
             break;
 
-          case 33:
-            _context9.prev = 33;
+          case 32:
+            _context9.prev = 32;
             _context9.t0 = _context9["catch"](1);
             console.log(_context9.t0);
             res.status(404).json({
               error: 1
             });
 
-          case 37:
+          case 36:
           case "end":
             return _context9.stop();
         }
       }
-    }, _callee9, null, [[1, 33]]);
+    }, _callee9, null, [[1, 32]]);
   }));
 
   return function getTopReaders(_x17, _x18) {

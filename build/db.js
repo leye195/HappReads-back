@@ -8,7 +8,9 @@ var _dotenv = _interopRequireDefault(require("dotenv"));
 
 _dotenv["default"].config();
 
-_mongoose["default"].connect(process.env.MONGO_URL_DEV, {
+console.log(process.env.PRODUCTION ? process.env.MONGO_URL_HEROKU : process.env.MONGO_URL_DEV);
+
+_mongoose["default"].connect(process.env.PRODUCTION ? process.env.MONGO_URL_HEROKU : process.env.MONGO_URL_DEV, {
   useNewUrlParser: true,
   useFindAndModify: false
 });
