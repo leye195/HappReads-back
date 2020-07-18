@@ -24,6 +24,7 @@ export const postSignUp = async (req, res) => {
     res.status(400).end();
   }
 };
+
 export const postLogout = async (req, res) => {
   req.logout();
   res.status(200).json({ loggedIn: 0, success: 1 });
@@ -51,6 +52,7 @@ export const getProfile = async (req, res) => {
     res.status(400).json({ error: 1 });
   }
 };
+
 export const postProfile = passport.authenticate("jwt", { session: false });
 
 export const postEdit = async (req, res) => {
@@ -131,11 +133,11 @@ export const postShelve = async (req, res) => {
     res.status(400).json({ error: 1 });
   }
 };
+
 export const deleteShelve = async (req, res) => {
   const {
     body: { uid, type, id },
   } = req;
-  console.log(uid, type, id);
   try {
     const user = await userModel
       .findById(uid)
@@ -147,11 +149,20 @@ export const deleteShelve = async (req, res) => {
         populate: { path: "book" },
       })
       .populate("uploaded");
-    const newList = user[type].filter((item) => {
-      return item.book !== null && String(item._id) !== String(id);
-    });
-    user[type] = newList;
-    user.save();
+    if (type !== null) {
+      const newList = user[type].filter((item) => {
+        return item.book !== null && String(item._id) !== String(id);
+      });
+      user[type] = newList;
+      user.save();
+    } else {
+      await bookModel.findByIdAndRemove(id);
+      const newList = user["uploaded"].filter((item) => {
+        return item.book !== null && String(item._id) !== String(id);
+      });
+      user[type] = newList;
+      user.save();
+    }
     res.status(200).json({ error: 0, user });
   } catch (error) {
     console.log(error);
@@ -272,6 +283,7 @@ export const getTopReaders = async (req, res) => {
     res.status(404).json({ error: 1 });
   }
 };
+
 export const getTopReviewers = async (req, res) => {
   const {
     params: { type },
