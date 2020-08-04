@@ -4,7 +4,18 @@ import userModel from "../models/userModel";
 
 export const getAllBooks = async (req, res, next) => {
   try {
-    const books = await bookModel.find();
+    const books = await bookModel
+      .find()
+      .populate({
+        path: "review",
+        populate: {
+          path: "reviewer",
+          model: userModel,
+        },
+      })
+      .populate({
+        path: "votes.voter",
+      });
     return res.status(200).json(books);
   } catch (e) {
     next(e);
