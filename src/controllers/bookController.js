@@ -1,6 +1,15 @@
 import reviewModel from "../models/reviewModel";
 import bookModel from "../models/bookModel";
 import userModel from "../models/userModel";
+
+export const getAllBooks = async (req, res, next) => {
+  try {
+    const books = await bookModel.find();
+    return res.status(200).json(books);
+  } catch (e) {
+    next(e);
+  }
+};
 /**
  * GET /books/:type?page={page}
  * @param {*} req

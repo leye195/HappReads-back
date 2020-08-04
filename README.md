@@ -2,7 +2,7 @@
 
 ### Back 사용기술:
 
-- express (nodejs 프레임워크)
+- Express (nodejs 프레임워크)
 - mongoDB (DB)
 - mongoose (ODM)
 - passport.js (로그인 인증 이용 소셜 로그인 및 로컬 로그인,가입 진행)
