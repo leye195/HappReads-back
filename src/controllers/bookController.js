@@ -261,7 +261,6 @@ export const postRate = async (req, res) => {
       book.save();
       user.votes.push(book.id);
       user.save();
-      console.log(book);
       res.status(200).json({ error: 0, book });
     }
   } catch (error) {
@@ -271,7 +270,7 @@ export const postRate = async (req, res) => {
 };
 
 /**
- * GET /books/:id/review
+ * GET /book/:id/review
  * @param {*} req
  * @param {*} res
  */

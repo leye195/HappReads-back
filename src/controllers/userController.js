@@ -236,7 +236,12 @@ export const getReviews = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(parseInt(limit) * (parseInt(page) - 1))
       .limit(parseInt(limit));
-    res.status(200).json({ error: 0, reviews, page });
+    res.status(200).json({
+      error: 0,
+      reviews,
+      page,
+      hasMore: reviews.length === parseInt(limit, 10) ? true : false,
+    });
   } catch (error) {
     console.log(error);
     res.status(404).json({ error: 1 });

@@ -78,6 +78,10 @@ const userSchema = mongoose.Schema({
       ref: "Review",
     },
   ],
+  token: {
+    type: String,
+    default: "",
+  },
 });
 userSchema.plugin(passportLocalMongoose, { usernameField: "email" }); //plugin 추가
 const userModel = mongoose.model("User", userSchema);

@@ -12,7 +12,7 @@ passport.use(
   new jwtStrategy(
     {
       jwtFromRequest: extractJWT.fromAuthHeaderWithScheme("jwt"),
-      secretOrKey: process.env.JWT_SECRET
+      secretOrKey: process.env.JWT_SECRET,
     },
     async (jwtPayload, done) => {
       if (jwtPayload.user) {
@@ -23,7 +23,7 @@ passport.use(
           .populate("want_read.book")
           .populate({
             path: "reviews",
-            populate: { path: "book" }
+            populate: { path: "book" },
           })
           .populate("uploaded");
         //console.log(user);
