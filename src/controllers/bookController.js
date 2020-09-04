@@ -162,7 +162,7 @@ export const getBookSearch = async (req, res) => {
     } else if (parseInt(type) === 2) {
       books = await bookModel.find({ authors: { $regex: q } });
     }
-    console.log(books);
+    //console.log(books);
     res.json({ books, error: 0 });
   } catch (e) {
     res.json({ books: [], error: 1 });
