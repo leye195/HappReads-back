@@ -21,6 +21,7 @@ export const getAllBooks = async (req, res, next) => {
     next(e);
   }
 };
+
 /**
  * GET /books/:type?page={page}
  * @param {*} req
@@ -97,11 +98,11 @@ export const getSliderBooks = async (req, res, next) => {
   }
 };
 
-/*
- *GET /popular
+/** 
+ * GET /popular
  * @param {*} req
  * @param {*} res
- */
+ **/
 export const getPopularBooks = async (req, res, next) => {
   try {
     const books = await bookModel.find().populate({
@@ -128,8 +129,8 @@ export const getPopularBooks = async (req, res, next) => {
   }
 };
 
-/*
- *GET /recent
+/** 
+ * GET /recent
  * @param {*} req
  * @param {*} res
  */
@@ -142,27 +143,33 @@ export const getRecentBooks = async (req, res, next) => {
   }
 };
 
-/*
- *GET /search?q={q}&type={type}
+/** 
+ * GET /search?q={q}&type={type}&page={page}
  * @param {*} req
  * @param {*} res
  */
 export const getBookSearch = async (req, res) => {
   try {
     const {
-      query: { q, type },
+      query: { q, type, page = 1 },
     } = req;
     let books = [];
     if (parseInt(type) === 0) {
       books = await bookModel
         .find()
-        .or([{ title: { $regex: q } }, { authors: { $regex: q } }]);
+        .or([{ title: { $regex: q } }, { authors: { $regex: q } }])
+        .skip((page-1)*10)
+        .limit(10);
     } else if (parseInt(type) === 1) {
-      books = await bookModel.find({ title: { $regex: q } });
+      books = await bookModel.find({ title: { $regex: q } })
+      .skip((page-1)*10)
+      .limit(10);;
     } else if (parseInt(type) === 2) {
-      books = await bookModel.find({ authors: { $regex: q } });
+      books = await bookModel.find({ authors: { $regex: q } })
+      .skip((page-1)*10)
+      .limit(10);;
     }
-    //console.log(books);
+    
     res.json({ books, error: 0 });
   } catch (e) {
     res.json({ books: [], error: 1 });
@@ -274,7 +281,6 @@ export const postRate = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-
 export const getReview = async (req, res) => {
   const {
     params: { id },
@@ -326,6 +332,7 @@ export const postReview = async (req, res) => {
     res.status(400).json({ error: 1 });
   }
 };
+
 /**
  * DELETE books/:id/review/:rid
  * @param {*} req
@@ -373,13 +380,14 @@ export const deleteReview = async (req, res, next) => {
     next(error);
   }
 };
+
 export const editReview = async (req, res) => {
   const {
     params: { rid },
     body: { content },
   } = req;
   try {
-    const review = await reviewModel.findByIdAndUpdate(rid, {
+    await reviewModel.findByIdAndUpdate(rid, {
       content: content,
     });
     res.status(200).json({ error: 0 });
