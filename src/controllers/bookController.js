@@ -31,7 +31,7 @@ export const getBooks = async (req, res) => {
   try {
     const {
       params: { type },
-      query: { page },
+      query: { page = 1 },
     } = req;
     let books = [];
     if (type === "전체") {
@@ -44,7 +44,7 @@ export const getBooks = async (req, res) => {
       books = await bookModel
         .find({ genres: { $regex: type } })
         .sort({ _id: -1 })
-        .skip((parseInt(page, 10) - 1) * 15)
+        .skip(((+page) - 1)* 15)
         .limit(15);
     }
     res.status(200).json({ error: 0, books, page: parseInt(page, 10) });
@@ -226,6 +226,7 @@ export const postBook = async (req, res) => {
     book.thumbnail = file.location; //book.thunbnail=thumbnail;
     book.genres = genres;
     book.save();
+
     user.uploaded.push(book.id);
     user.save();
     res.status(200).json({ error: 0 });
@@ -245,7 +246,6 @@ export const postRate = async (req, res) => {
     body: { vote, name },
     params: { id },
   } = req;
-  //console.log(id, vote, name);
   try {
     const user = await userModel.findByUsername(name);
     let book = await bookModel.findById(id).populate({
@@ -365,7 +365,6 @@ export const deleteReview = async (req, res, next) => {
       const cleanedReviews = user.reviews.filter((review) => {
         return String(review.id) !== String(rid);
       });
-      //console.log(cleanedBookReviews, cleanedReviews);
       book.review = cleanedBookReviews;
       user.reviews = cleanedReviews;
       book.save();

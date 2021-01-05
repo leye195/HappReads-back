@@ -34,8 +34,8 @@ app.get(routes.reviews, getReviews);
 
 app.post(routes.login, postLogin, (req, res) => {
   const { user } = req;
-  const token = jwt.sign({ user }, process.env.JWT_SECRET);
-  res.status(200).json({ loggedIn: 1, user, token: `jwt ` + token });
+  const token = jwt.sign(user.email, process.env.JWT_SECRET);
+  res.status(200).json({ loggedIn: 1, user, token });
 });
 app.get(routes.loginfailure, (req, res) => {
   res.status(404).json({ loggedIn: 0 });

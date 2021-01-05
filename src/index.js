@@ -12,7 +12,10 @@ import "./passport";
 dotenv.config();
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin: true,
+}));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
